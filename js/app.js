@@ -135,14 +135,18 @@ console.log("REPONSE RECUE");
             const result =
                 await response.json();
 
-            if (!result.success) {
+          if (!result.success) {
 
-                confirmation.innerHTML =
-                    `<div class="error-message">Erreur lors de l'inscription.</div>`;
+    const msg =
+        result.reason === "duplicate"
+            ? "Cette adresse courriel a déjà participé."
+            : "Erreur lors de l'inscription.";
 
-                return;
+    confirmation.innerHTML =
+        `<div class="error-message">${msg}</div>`;
 
-            }
+    return;
+}
 
             participant.ticketNumber =
                 result.ticketNumber;
