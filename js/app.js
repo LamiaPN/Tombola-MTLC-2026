@@ -114,7 +114,7 @@ form.addEventListener(
 
         try {
 
-            const response =
+          
 
             console.log("API =", API_URL);
 
@@ -122,7 +122,7 @@ console.log("ENVOI APPS SCRIPT");
 console.log(participant);
 const response =
     await fetch(API_URL, {
-                await fetch(API_URL, {
+            
 
                     method: "POST",
 
