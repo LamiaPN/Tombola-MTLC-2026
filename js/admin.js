@@ -13,10 +13,37 @@ const searchInput =
         "searchInput"
     );
 
-let participants =
-    getParticipants();
+let participants = [];
 
-renderTable(participants);
+loadParticipants();
+
+async function loadParticipants() {
+
+    try {
+
+        tableBody.innerHTML =
+            `<tr><td colspan="4">Chargement...</td></tr>`;
+
+        const response =
+            await fetch(API_URL);
+
+        participants =
+            await response.json();
+
+        renderTable(participants);
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        tableBody.innerHTML =
+            `<tr><td colspan="4">Erreur de chargement.</td></tr>`;
+
+    }
+
+}
 
 function renderTable(data){
 
@@ -119,8 +146,11 @@ const blob =
 }
 
 document
-.getElementById("resetBtn")
-.addEventListener("click", () => {
+.getElementById("refreshBtn")
+.addEventListener(
+    "click",
+    loadParticipants
+);
 
     const confirmReset =
         confirm(
