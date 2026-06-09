@@ -1,195 +1,314 @@
-const drawBtn =
-    document.getElementById("drawBtn");
+/* ==========================================
+   TOMBOLA MTL CONNECTE 2026 - Tirage
+   Lit les participants depuis Google Sheets
+   via l'API Apps Script
+   Gagnant tiré une seule fois
+   ========================================== */
 
-const drawDisplay =
-    document.getElementById("drawDisplay");
+console.log("[tirage.js] Version Google Sheets corrigée - tirage unique - 2026-06-09");
 
-const winnerInfo =
-    document.getElementById("winnerInfo");
+document.addEventListener("DOMContentLoaded", () => {
+  const drawBtn = document.getElementById("drawBtn");
+  const drawDisplay = document.getElementById("drawDisplay");
+  const winnerInfo = document.getElementById("winnerInfo");
 
-drawBtn.addEventListener(
-    "click",
-    launchDraw
-);
+  if (!drawBtn) {
+    console.warn("Bouton drawBtn introuvable sur cette page.");
+    return;
+  }
 
-function launchDraw(){
+  if (typeof API_URL === "undefined") {
+    console.error("API_URL est introuvable. Vérifie que api.js est chargé avant tirage.js.");
+    drawBtn.disabled = true;
+    return;
+  }
 
-    const participants =
-        getParticipants();
+  drawBtn.addEventListener("click", launchDraw);
 
-    if(participants.length === 0){
+  async function fetchParticipantsFromSheet() {
+    const response = await fetch(API_URL);
 
-        alert("Aucun participant.");
+    if (!response.ok) {
+      throw new Error("Réponse serveur invalide : " + response.status);
+    }
 
-        return;
+    const data = await response.json();
+
+    console.log("Participants reçus pour le tirage :", data);
+
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    if (data && Array.isArray(data.participants)) {
+      return data.participants;
+    }
+
+    console.error("Format API inattendu :", data);
+    return [];
+  }
+
+  async function launchDraw() {
+    if (!drawDisplay || !winnerInfo) {
+      alert("Zone de tirage introuvable dans la page.");
+      return;
     }
 
     drawBtn.disabled = true;
+    drawBtn.textContent = "Chargement...";
 
     winnerInfo.innerHTML = "";
-    drawDisplay.className =
-    "draw-display drawing";
+
+    drawDisplay.style.display = "block";
+    drawDisplay.className = "draw-display drawing";
+    drawDisplay.textContent = "...";
+
+    showLogo();
+
+    let participants = [];
+
+    try {
+      participants = await fetchParticipantsFromSheet();
+      participants = participants
+        .map(normalizeParticipant)
+        .filter(participant =>
+          participant.ticketNumber ||
+          participant.fullName ||
+          participant.email
+        );
+    } catch (error) {
+      console.error("Erreur chargement participants pour le tirage :", error);
+      alert("Impossible de charger les participants depuis le Google Sheet.");
+      drawBtn.disabled = false;
+      drawBtn.textContent = "Lancer le tirage";
+      drawDisplay.textContent = "";
+      return;
+    }
+
+    if (participants.length === 0) {
+      alert("Aucun participant disponible pour le tirage.");
+      drawBtn.disabled = false;
+      drawBtn.textContent = "Lancer le tirage";
+      drawDisplay.textContent = "";
+      return;
+    }
+
+    drawBtn.textContent = "Tirage en cours...";
+
+    /*
+      IMPORTANT :
+      Le gagnant est tiré UNE SEULE FOIS ici.
+      L'animation doit s'arrêter sur ce même gagnant.
+    */
+    const winner =
+      participants[Math.floor(Math.random() * participants.length)];
 
     let speed = 50;
-
     let cycles = 0;
 
-    function spin(){
+    function spin() {
+      const randomParticipant =
+        participants[Math.floor(Math.random() * participants.length)];
 
-        const randomParticipant =
+      drawDisplay.textContent = randomParticipant.ticketNumber;
 
-            participants[
-                Math.floor(
-                    Math.random()
-                    * participants.length
-                )
-            ];
+      cycles++;
 
-        drawDisplay.textContent =
-            randomParticipant.ticketNumber;
+      if (cycles > 35) {
+        speed += 12;
+      }
 
-        cycles++;
+      if (cycles > 55) {
+        speed += 18;
+      }
 
-        if(cycles > 35){
+      if (cycles > 70) {
+        speed += 25;
+      }
 
-            speed += 12;
-        }
+      if (cycles >= 80) {
+        /*
+          L'écran s'arrête sur le vrai gagnant.
+          Pas de deuxième tirage ici.
+        */
+        drawDisplay.textContent = winner.ticketNumber;
 
-        if(cycles > 55){
+        displayWinner(winner);
 
-            speed += 18;
-        }
+        drawBtn.disabled = false;
+        drawBtn.textContent = "Relancer le tirage";
 
-        if(cycles > 70){
+        console.log("Gagnant tiré :", winner);
 
-            speed += 25;
-        }
+        return;
+      }
 
-        if(cycles >= 80){
-
-            const winner =
-
-                participants[
-                    Math.floor(
-                        Math.random()
-                        * participants.length
-                    )
-                ];
-
-            displayWinner(winner);
-
-            return;
-        }
-
-        setTimeout(spin, speed);
-
+      setTimeout(spin, speed);
     }
 
     spin();
+  }
 
-}
-
-function displayWinner(winner) {
-
-    // Cache le numéro qui défile
+  function displayWinner(winner) {
     drawDisplay.style.display = "none";
 
-    // Cache le logo Printemps Numérique
-    const logo = document.querySelector(
-        ".tirage-logo-container"
-    );
+    hideLogo();
 
-    if (logo) {
-
-        logo.style.display = "none";
-
-    }
-
-    // Affiche le gagnant
     winnerInfo.innerHTML = `
+      <h2>🎉 GAGNANT 🎉</h2>
 
-        <h2>🎉 GAGNANT 🎉</h2>
+      <div class="winner-name">
+        ${escapeHtml(winner.fullName)}
+      </div>
 
-        <div class="winner-name">
-            ${escapeHtml(winner.firstName)}
-            ${escapeHtml(winner.lastName)}
-        </div>
+      <div class="winner-company">
+        ${escapeHtml(winner.company)}
+      </div>
 
-        <div class="winner-company">
-            ${escapeHtml(winner.company)}
-        </div>
-
-        <div class="winner-ticket">
-            ${escapeHtml(winner.ticketNumber)}
-        </div>
-
+      <div class="winner-ticket">
+        ${escapeHtml(winner.ticketNumber)}
+      </div>
     `;
 
-    // Confettis
-    const duration = 8000;
+    launchConfetti();
+  }
 
-    const animationEnd =
-        Date.now() + duration;
+  function normalizeParticipant(participant) {
+    const ticketNumber =
+      participant.ticketNumber ||
+      participant.numero ||
+      participant.numéro ||
+      participant.Numero ||
+      participant.Numéro ||
+      participant["Numéro"] ||
+      "";
 
-    const defaults = {
+    const firstName =
+      participant.firstName ||
+      participant.prenom ||
+      participant.prénom ||
+      participant.Prenom ||
+      participant.Prénom ||
+      participant["Prénom"] ||
+      "";
 
-        startVelocity: 30,
+    const lastName =
+      participant.lastName ||
+      participant.nom ||
+      participant.Nom ||
+      "";
 
-        spread: 360,
+    const fullName =
+      participant.fullName ||
+      participant.name ||
+      participant.nomComplet ||
+      participant["Nom complet"] ||
+      `${firstName} ${lastName}`.trim();
 
-        ticks: 100
+    const company =
+      participant.company ||
+      participant.entreprise ||
+      participant.Entreprise ||
+      "";
 
+    const email =
+      participant.email ||
+      participant.courriel ||
+      participant.Courriel ||
+      participant.mail ||
+      "";
+
+    return {
+      ticketNumber,
+      firstName,
+      lastName,
+      fullName,
+      company,
+      email
     };
+  }
 
-    function randomInRange(min, max) {
+  function showLogo() {
+    const logoContainer = document.querySelector(".tirage-logo-container");
+    const logo = document.querySelector(".tirage-logo");
 
-        return Math.random() *
-            (max - min) + min;
-
+    if (logoContainer) {
+      logoContainer.style.display = "block";
     }
 
-    const interval = setInterval(function () {
+    if (logo) {
+      logo.style.display = "block";
+    }
+  }
 
-        const timeLeft =
-            animationEnd - Date.now();
+  function hideLogo() {
+    const logoContainer = document.querySelector(".tirage-logo-container");
+    const logo = document.querySelector(".tirage-logo");
 
-        if (timeLeft <= 0) {
+    if (logoContainer) {
+      logoContainer.style.display = "none";
+    }
 
-            clearInterval(interval);
+    if (logo) {
+      logo.style.display = "none";
+    }
+  }
 
-            return;
+  function launchConfetti() {
+    if (typeof confetti === "undefined") {
+      console.warn("Librairie confetti introuvable.");
+      return;
+    }
 
+    const duration = 8000;
+    const animationEnd = Date.now() + duration;
+
+    const defaults = {
+      startVelocity: 30,
+      spread: 360,
+      ticks: 100
+    };
+
+    const interval = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        return;
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: {
+          x: randomInRange(0.1, 0.3),
+          y: Math.random() - 0.2
         }
+      });
 
-        const particleCount =
-            50 * (timeLeft / duration);
-
-        confetti({
-
-            ...defaults,
-
-            particleCount,
-
-            origin: {
-                x: randomInRange(0.1, 0.3),
-                y: Math.random() - 0.2
-            }
-
-        });
-
-        confetti({
-
-            ...defaults,
-
-            particleCount,
-
-            origin: {
-                x: randomInRange(0.7, 0.9),
-                y: Math.random() - 0.2
-            }
-
-        });
-
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: {
+          x: randomInRange(0.7, 0.9),
+          y: Math.random() - 0.2
+        }
+      });
     }, 250);
+  }
 
-}
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function escapeHtml(value) {
+    return String(value || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+});
