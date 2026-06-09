@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Administration Tombola</title>
+
+    <link rel="stylesheet" href="css/app.css">
+
+</head>
+
+<body>
+
+<div class="admin-page">
+
+    <div class="admin-card">
+
+        <div class="admin-header">
+
+            <img
+                src="assets/logo.png"
+                alt="Logo"
+                class="form-logo"
+            >
+
+            <h1>Console d'administration</h1>
+
+        </div>
+
+        <div class="stats-box">
+
+            Participants :
+            <span id="participantCount">
+                0
+            </span>
+
+        </div>
+
+        <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="🔍 Rechercher..."
+        >
+
+        <div class="admin-actions">
+
+            <button id="exportCsvBtn" class="submit-btn">
+                Exporter CSV
+            </button>
+
+            <button id="resetBtn" class="danger-btn">
+                Réinitialiser
+            </button>
+            <button onclick="window.location.href='tirage.html'"
+             class="submit-btn">Lancer le tirage
+            </button>
+
+        </div>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Numéro</th>
+                        <th>Nom</th>
+                        <th>Entreprise</th>
+                        <th>Courriel</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="participantsTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/admin.js"></script>
+
+</body>
+
+</html>

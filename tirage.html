@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Tombola MTL connecte - Tirage</title>
+
+    <link rel="stylesheet"
+          href="css/app.css">
+
+</head>
+
+<body>
+
+<div class="page-layout">
+
+    <!-- BANNIÈRE -->
+
+    <div class="left-panel">
+
+        <img
+            src="assets/banner.png"
+            alt="MTL connecte"
+            class="banner-image">
+
+    </div>
+
+    <!-- ZONE DROITE -->
+
+    <div class="right-panel">
+
+        <!-- LOGO CENTRÉ -->
+
+       <!--  <img
+            src="assets/logo.png"
+            alt="Printemps Numérique"
+            class="tirage-logo">
+ -->
+        <!-- CARTE -->
+
+        <div class="tirage-card">
+
+            <div
+                id="drawDisplay"
+                class="draw-display waiting">
+
+                Cliquez sur lancer
+
+            </div>
+
+            <div
+                id="winnerInfo"
+                class="winner-info">
+
+            </div>
+
+            <button
+                id="drawBtn"
+                class="submit-btn draw-btn">
+
+                Lancer le tirage
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/storage.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script src="js/tirage.js"></script>
+</body>
+
+</html>

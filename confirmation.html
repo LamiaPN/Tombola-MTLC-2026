@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Participation enregistrée</title>
+
+    <link rel="stylesheet" href="css/app.css">
+
+</head>
+
+<body>
+
+<div class="confirmation-page">
+
+    <div class="confirmation-card">
+
+        <img
+            src="assets/logo.png"
+            alt="MTL connecte"
+            class="form-logo"
+        >
+
+        <h1>🎉 Participation enregistrée</h1>
+
+        <p class="confirmation-text">
+            Votre numéro officiel :
+        </p>
+
+        <div
+            id="ticketNumber"
+            class="ticket-number"
+        >
+            T-0000
+        </div>
+
+        <div
+            id="participantInfo"
+            class="participant-info"
+        >
+        </div>
+
+        <button
+            id="finishBtn"
+            class="submit-btn"
+        >
+            Terminer
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const participant =
+    JSON.parse(
+        localStorage.getItem(
+            "lastParticipant"
+        )
+    );
+
+if(participant){
+
+    document.getElementById(
+        "ticketNumber"
+    ).textContent =
+        participant.ticketNumber;
+
+    document.getElementById(
+        "participantInfo"
+    ).innerHTML = `
+        <strong>
+            ${participant.firstName}
+            ${participant.lastName}
+        </strong>
+        <br>
+        ${participant.company}
+    `;
+
+}
+
+document
+.getElementById("finishBtn")
+.addEventListener("click",()=>{
+
+    window.location.href =
+        "index.html";
+
+});
+
+</script>
+
+</body>
+
+</html>
