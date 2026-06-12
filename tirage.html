@@ -34,22 +34,30 @@
 
     <div class="right-panel">
 
-        <!-- LOGO CENTRÉ -->
-
-        <img
-            src="assets/logo.png"
-            alt="Printemps Numérique"
-            class="tirage-logo">
-
-        <!-- CARTE -->
-
         <div class="tirage-card">
+
+            <div id="wheelStage" class="wheel-stage">
+
+                <div class="wheel-pointer"></div>
+
+                <canvas
+                    id="wheelCanvas"
+                    class="wheel-canvas"
+                    width="600"
+                    height="600">
+                </canvas>
+
+                <div class="wheel-center">
+                    MTL
+                </div>
+
+            </div>
 
             <div
                 id="drawDisplay"
                 class="draw-display waiting">
 
-                Cliquez sur lancer
+
 
             </div>
 
