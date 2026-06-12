@@ -164,6 +164,11 @@ document.addEventListener("DOMContentLoaded", () => {
       drawDisplay.textContent = "Tirage en cours...";
     }
 
+    /*
+      IMPORTANT :
+      Le gagnant est tiré UNE SEULE FOIS ici.
+      La roue s'arrête ensuite sur ce même gagnant.
+    */
     const winnerIndex = Math.floor(Math.random() * participants.length);
     const winner = participants[winnerIndex];
 
