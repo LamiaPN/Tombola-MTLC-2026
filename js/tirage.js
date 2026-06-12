@@ -1,314 +1,342 @@
-/* ==========================================
-   TOMBOLA MTL CONNECTE 2026 - Tirage
-   Lit les participants depuis Google Sheets
-   via l'API Apps Script
-   Gagnant tiré une seule fois
-   ========================================== */
+/* ==========================
+TIRAGE
+========================== */
 
-console.log("[tirage.js] Version Google Sheets corrigée - tirage unique - 2026-06-09");
+.tirage-logo-container{
 
-document.addEventListener("DOMContentLoaded", () => {
-  const drawBtn = document.getElementById("drawBtn");
-  const drawDisplay = document.getElementById("drawDisplay");
-  const winnerInfo = document.getElementById("winnerInfo");
+    width:100%;
 
-  if (!drawBtn) {
-    console.warn("Bouton drawBtn introuvable sur cette page.");
-    return;
-  }
+    display:flex;
 
-  if (typeof API_URL === "undefined") {
-    console.error("API_URL est introuvable. Vérifie que api.js est chargé avant tirage.js.");
-    drawBtn.disabled = true;
-    return;
-  }
+    justify-content:center;
 
-  drawBtn.addEventListener("click", launchDraw);
+    align-items:center;
 
-  async function fetchParticipantsFromSheet() {
-    const response = await fetch(API_URL);
+    margin-bottom:20px;
 
-    if (!response.ok) {
-      throw new Error("Réponse serveur invalide : " + response.status);
+}
+
+.tirage-logo{
+
+    width:220px;
+
+}
+
+.tirage-card{
+
+    background:white;
+
+    border-radius:24px;
+
+    padding:30px 50px;
+
+    text-align:center;
+
+    width:100%;
+
+    max-width:900px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.08);
+
+}
+
+.draw-display{
+
+    font-weight:800;
+
+    transition:all .3s ease;
+
+    margin:20px 0;
+
+}
+
+.draw-display.waiting{
+
+    font-size:70px;
+
+    color:#6DBE45;
+
+}
+
+.draw-display.drawing{
+
+    font-size:120px;
+
+    color:#6DBE45;
+
+}
+
+.draw-display.winner{
+
+    font-size:110px;
+
+    color:#6DBE45;
+
+}
+
+.winner-info{
+
+    margin:25px 0;
+
+    padding:20px;
+
+    border-radius:20px;
+
+    background:#f8fff5;
+
+}
+
+.winner-info h2{
+
+    font-size:45px;
+
+    color:#6DBE45;
+
+    margin-bottom:20px;
+
+}
+
+.winner-name{
+
+    font-size:120px;
+
+    font-weight:900;
+
+    line-height:1.1;
+
+    margin-top:10px;
+
+    animation:winnerPulse 1s infinite;
+
+}
+
+.winner-company{
+
+    font-size:55px;
+
+    color:#666;
+
+    margin-top:15px;
+
+}
+
+.winner-ticket{
+
+    font-size:80px;
+
+    font-weight:800;
+
+    color:#6DBE45;
+
+    margin-top:25px;
+
+}
+
+.winner-message{
+
+    font-size:30px;
+
+    color:#444;
+
+    margin-top:20px;
+
+}
+
+@keyframes winnerPulse{
+
+    0%{
+        transform:scale(1);
     }
 
-    const data = await response.json();
-
-    console.log("Participants reçus pour le tirage :", data);
-
-    if (Array.isArray(data)) {
-      return data;
+    50%{
+        transform:scale(1.05);
     }
 
-    if (data && Array.isArray(data.participants)) {
-      return data.participants;
+    100%{
+        transform:scale(1);
     }
 
-    console.error("Format API inattendu :", data);
-    return [];
-  }
+}
 
-  async function launchDraw() {
-    if (!drawDisplay || !winnerInfo) {
-      alert("Zone de tirage introuvable dans la page.");
-      return;
+.draw-btn{
+
+    width:auto;
+
+    min-width:300px;
+
+    padding:18px 35px;
+
+    margin-top:20px;
+
+}
+
+.winner-ticket{
+
+    margin-top:20px;
+
+    font-size:48px;
+
+    font-weight:700;
+
+    color:#6DBE45;
+
+}
+
+/* ================================
+   ROUE DE TIRAGE
+   ================================ */
+
+.wheel-stage {
+    position: relative;
+    width: min(520px, 90vw);
+    height: min(520px, 90vw);
+    margin: 0 auto 24px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wheel-canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.28),
+        inset 0 0 0 10px rgba(255, 255, 255, 0.85);
+}
+
+.wheel-pointer {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    width: 0;
+    height: 0;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-top: 42px solid #111827;
+    filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.25));
+}
+
+.wheel-center {
+    position: absolute;
+    z-index: 4;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.4rem;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+}
+
+.draw-display.waiting {
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
+
+.draw-display.drawing {
+    text-align: center;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 700px) {
+    .wheel-stage {
+        width: min(360px, 88vw);
+        height: min(360px, 88vw);
     }
 
-    drawBtn.disabled = true;
-    drawBtn.textContent = "Chargement...";
+    .wheel-center {
+        width: 72px;
+        height: 72px;
+        font-size: 1rem;
+    }
+}
+/* ================================
+   CORRECTION AFFICHAGE PAGE TIRAGE
+   ================================ */
 
-    winnerInfo.innerHTML = "";
+.right-panel {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 48px;
+    box-sizing: border-box;
+}
 
-    drawDisplay.style.display = "block";
-    drawDisplay.className = "draw-display drawing";
-    drawDisplay.textContent = "...";
+.tirage-card {
+    width: 100%;
+    max-width: 1100px;
+    min-height: auto;
+    display: grid;
+    grid-template-columns: 520px 1fr;
+    align-items: center;
+    gap: 56px;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+}
 
-    showLogo();
+.wheel-stage {
+    position: relative;
+    width: 460px;
+    height: 460px;
+    margin: 0 auto;
+}
 
-    let participants = [];
+.wheel-canvas {
+    width: 460px;
+    height: 460px;
+    border-radius: 50%;
+}
 
-    try {
-      participants = await fetchParticipantsFromSheet();
-      participants = participants
-        .map(normalizeParticipant)
-        .filter(participant =>
-          participant.ticketNumber ||
-          participant.fullName ||
-          participant.email
-        );
-    } catch (error) {
-      console.error("Erreur chargement participants pour le tirage :", error);
-      alert("Impossible de charger les participants depuis le Google Sheet.");
-      drawBtn.disabled = false;
-      drawBtn.textContent = "Lancer le tirage";
-      drawDisplay.textContent = "";
-      return;
+.wheel-pointer {
+    top: -8px;
+}
+
+.draw-display {
+    text-align: center;
+    color: #67bf43;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(3rem, 5vw, 5rem);
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.winner-info {
+    grid-column: 2;
+    max-width: 520px;
+    text-align: center;
+}
+
+.draw-btn {
+    grid-column: 2;
+    justify-self: center;
+    margin-top: 24px;
+}
+
+@media (max-width: 1000px) {
+    .tirage-card {
+        grid-template-columns: 1fr;
+        gap: 28px;
     }
 
-    if (participants.length === 0) {
-      alert("Aucun participant disponible pour le tirage.");
-      drawBtn.disabled = false;
-      drawBtn.textContent = "Lancer le tirage";
-      drawDisplay.textContent = "";
-      return;
+    .winner-info,
+    .draw-btn {
+        grid-column: 1;
     }
 
-    drawBtn.textContent = "Tirage en cours...";
-
-    /*
-      IMPORTANT :
-      Le gagnant est tiré UNE SEULE FOIS ici.
-      L'animation doit s'arrêter sur ce même gagnant.
-    */
-    const winner =
-      participants[Math.floor(Math.random() * participants.length)];
-
-    let speed = 50;
-    let cycles = 0;
-
-    function spin() {
-      const randomParticipant =
-        participants[Math.floor(Math.random() * participants.length)];
-
-      drawDisplay.textContent = randomParticipant.ticketNumber;
-
-      cycles++;
-
-      if (cycles > 35) {
-        speed += 12;
-      }
-
-      if (cycles > 55) {
-        speed += 18;
-      }
-
-      if (cycles > 70) {
-        speed += 25;
-      }
-
-      if (cycles >= 80) {
-        /*
-          L'écran s'arrête sur le vrai gagnant.
-          Pas de deuxième tirage ici.
-        */
-        drawDisplay.textContent = winner.ticketNumber;
-
-        displayWinner(winner);
-
-        drawBtn.disabled = false;
-        drawBtn.textContent = "Relancer le tirage";
-
-        console.log("Gagnant tiré :", winner);
-
-        return;
-      }
-
-      setTimeout(spin, speed);
+    .wheel-stage,
+    .wheel-canvas {
+        width: 360px;
+        height: 360px;
     }
-
-    spin();
-  }
-
-  function displayWinner(winner) {
-    drawDisplay.style.display = "none";
-
-    hideLogo();
-
-    winnerInfo.innerHTML = `
-      <h2>🎉 GAGNANT 🎉</h2>
-
-      <div class="winner-name">
-        ${escapeHtml(winner.fullName)}
-      </div>
-
-      <div class="winner-company">
-        ${escapeHtml(winner.company)}
-      </div>
-
-      <div class="winner-ticket">
-        ${escapeHtml(winner.ticketNumber)}
-      </div>
-    `;
-
-    launchConfetti();
-  }
-
-  function normalizeParticipant(participant) {
-    const ticketNumber =
-      participant.ticketNumber ||
-      participant.numero ||
-      participant.numéro ||
-      participant.Numero ||
-      participant.Numéro ||
-      participant["Numéro"] ||
-      "";
-
-    const firstName =
-      participant.firstName ||
-      participant.prenom ||
-      participant.prénom ||
-      participant.Prenom ||
-      participant.Prénom ||
-      participant["Prénom"] ||
-      "";
-
-    const lastName =
-      participant.lastName ||
-      participant.nom ||
-      participant.Nom ||
-      "";
-
-    const fullName =
-      participant.fullName ||
-      participant.name ||
-      participant.nomComplet ||
-      participant["Nom complet"] ||
-      `${firstName} ${lastName}`.trim();
-
-    const company =
-      participant.company ||
-      participant.entreprise ||
-      participant.Entreprise ||
-      "";
-
-    const email =
-      participant.email ||
-      participant.courriel ||
-      participant.Courriel ||
-      participant.mail ||
-      "";
-
-    return {
-      ticketNumber,
-      firstName,
-      lastName,
-      fullName,
-      company,
-      email
-    };
-  }
-
-  function showLogo() {
-    const logoContainer = document.querySelector(".tirage-logo-container");
-    const logo = document.querySelector(".tirage-logo");
-
-    if (logoContainer) {
-      logoContainer.style.display = "block";
-    }
-
-    if (logo) {
-      logo.style.display = "block";
-    }
-  }
-
-  function hideLogo() {
-    const logoContainer = document.querySelector(".tirage-logo-container");
-    const logo = document.querySelector(".tirage-logo");
-
-    if (logoContainer) {
-      logoContainer.style.display = "none";
-    }
-
-    if (logo) {
-      logo.style.display = "none";
-    }
-  }
-
-  function launchConfetti() {
-    if (typeof confetti === "undefined") {
-      console.warn("Librairie confetti introuvable.");
-      return;
-    }
-
-    const duration = 8000;
-    const animationEnd = Date.now() + duration;
-
-    const defaults = {
-      startVelocity: 30,
-      spread: 360,
-      ticks: 100
-    };
-
-    const interval = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        clearInterval(interval);
-        return;
-      }
-
-      const particleCount = 50 * (timeLeft / duration);
-
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: {
-          x: randomInRange(0.1, 0.3),
-          y: Math.random() - 0.2
-        }
-      });
-
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: {
-          x: randomInRange(0.7, 0.9),
-          y: Math.random() - 0.2
-        }
-      });
-    }, 250);
-  }
-
-  function randomInRange(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-
-  function escapeHtml(value) {
-    return String(value || "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-});
+}
