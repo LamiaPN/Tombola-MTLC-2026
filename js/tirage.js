@@ -374,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     winnerInfo.innerHTML = `
-      <h2>🎉LA ou LE GAGNANT·E 🎉</h2>
+      <h2>🎉LE ou LA GAGNANT·E 🎉</h2>
 
       <div class="winner-name">
         ${escapeHtml(winner.fullName)}
