@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
       drawWheel(participants, currentRotation);
 
       if (drawDisplay) {
-        drawDisplay.textContent = "Cliquez sur lancer";
+        drawDisplay.textContent = "Cliquez";
       }
 
       drawBtn.disabled = false;
