@@ -681,9 +681,20 @@ TIRAGE
     background:#f8fff5;
 }
 
-/* Cache la carte gagnant tant qu'elle est vide */
+/* Cache la carte gagnant tant qu'elle ne contient pas de gagnant.
+   Couvre le cas vide ET le cas d'un contenu blanc/vide laissé par le JS. */
 .winner-info:empty{
     display:none;
+}
+
+/* Par defaut on masque la carte ; elle ne s'affiche que lorsqu'elle
+   contient reellement le bloc gagnant (.winner-name). */
+.winner-info{
+    display:none;
+}
+
+.winner-info:has(.winner-name){
+    display:block;
 }
 
 .winner-info h2{
